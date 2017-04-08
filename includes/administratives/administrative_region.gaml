@@ -36,19 +36,19 @@ global {
 		string province_name;
 		string id_3;
 		string district_name;
-		float  transplantation_index <- 0.0 ;
-		float  number_of_BPHs        <- 0.0 ;
+		float  transplantation_index <- 0.0;
+		float  number_of_BPHs        <- 0.0;
 		
 		rgb color <- #white;
-		float lighttrap_density_min   <- 0.0 ;
-		float lighttrap_density_mean  <- 0.0 ;
-		float lighttrap_density_max   <- 0.0 ;
-		float propagated_density_min  <- 0.0 ;
-		float propagated_density_mean <- 0.0 ;
-		float propagated_density_max  <- 0.0 ;
-		float estimated_density_min   <- 0.0 ;
-		float estimated_density_mean  <- 0.0 ;
-		float estimated_density_max   <- 0.0 ;
+		float lighttrap_density_min   <- 0.0;
+		float lighttrap_density_mean  <- 0.0;
+		float lighttrap_density_max   <- 0.0;
+		float propagated_density_min  <- 0.0;
+		float propagated_density_mean <- 0.0;
+		float propagated_density_max  <- 0.0;
+		float estimated_density_min   <- 0.0;
+		float estimated_density_mean  <- 0.0;
+		float estimated_density_max   <- 0.0;
 	}
 
 	species smalltown_region skills: [moving] {
@@ -63,7 +63,7 @@ global {
 		rgb color <- #white;
 		
 		init {
-			rgb color <- (id_2 = '38253') ? 'blue' : 'white';
+			color <- (id_2 = '38253') ? #blue : #white;
 		}
 	}
 	species administrative_region skills: [moving] {
@@ -77,7 +77,7 @@ global {
 		string smalltown_name;
 		rgb color <- #white;
 		init {
-			rgb color <- (id_2 = '38253') ? 'blue' : 'white';
+			color <- (id_2 = '38253') ? #blue : #white;
 		}
 	}
 	

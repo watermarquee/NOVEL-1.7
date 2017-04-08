@@ -8,49 +8,43 @@ import "../../models/GlobalModel3D.gaml"
 
 global {
 	//var SHAPE_NODE type: string init: '../includes/gis/surveillances/provinces/DongThap_Lighttraps.shp' parameter: 'Sensors Network - DONG THAP:' category: 'SURVEILLANCE' ;
-	var lasted_edge_id type: int init: 0;
-	var current_edge type: edge init: nil;
+	int lasted_edge_id <- 0;
+	edge current_edge <- nil;
 	
-	var vectorXX type: list value: nil;
-	var vectorYY type: list value: nil;
-	var correlationAVG type: float init: 0.0;
-	var correlationCount type: int init: 0;
+	list vectorXX <- nil;
+	list vectorYY <- nil;
+	float correlationAVG <- 0.0;
+	int correlationCount <- 0;
 	
-	
-	var x1 type: float value: 0.0;  
-	var y1 type: float value: 0.0;						
-	var x2 type: float value: 0.0;  
-	var y2 type: float value: 0.0;
-	var x1_to type: float value: 0.0;
-	var y1_to type: float value: 0.0;
+	float x1 <- 0.0;  
+	float y1 <- 0.0;						
+	float x2 <- 0.0;  
+	float y2 <- 0.0;
+	float x1_to <- 0.0;
+	float y1_to <- 0.0;
 	
 	// TEST
-	var testtest type: int init: 0;
-	var testcor type: float init: 0.0;
+	int testtest <- 0;
+	float testcor <- 0.0;
 	
 	init{
 		//create species: node from: SHAPE_NODE with: [id :: read('ID'), name :: read('LightTrap'), district_name :: read('District'), province_name :: read('Province'), id_0 :: read('ID_0'), id_1 :: read('ID_1'), id_2 :: read('ID_2')];
 	}
 }
-
-entities {
 	
-	species UnitDiskGraph skills: [situated] {
-		var UDgraph type: graph init: nil;
-		var setup type: int init: 0;
+	species UnitDiskGraph skills: [moving] {
+		graph UDgraph <- nil;
+		int setup <- 0;
 		
-		var alpha type: float init: 135.0;
-		
+		float alpha <- 135.0;
 				
 		// Tempo variable used in check_simple_connection action:
-		var connected_temp type: bool init: false;
+		bool connected_temp <- false;
 		
-		var working_status type: bool value: true;
+		bool working_status <- true;
 		
-		action allocateNewNodeByCorrelation
-		{
+		action allocateNewNodeByCorrelation {
 			arg center_node type: node;
-			
 			let location_found type: bool value: false;
 			let center_correlation type: float value: 0.0;
 			let cell_correlation type: float value: 0.0;
@@ -60,17 +54,14 @@ entities {
 			let the_potential_cell type: cellula_automata value: nil;
 			list cell_list value: (list (cellula_correlation))  where (((cellula_correlation (each) distance_to center_node) <= DISK_RADIUS) and ((cellula_correlation (each) distance_to center_node) > LOWEST_RADIUS)) ;
 			
-			ask target: center_node
-			{
+			ask target: center_node {
 				set center_correlation value: dominated_cell_correlation.correlation_coefficient;
-				
 			}
 						
-			loop cnt from: 0 to: length(cell_list) - 1 
-			{
+			loop cnt from: 0 to: length(cell_list) - 1 {
 				let the_cell type: cellula_automata value: cell_list at cnt; // SAI
-				ask target: cell_list at cnt
-				{
+				
+				ask target: cell_list at cnt {
 					set cell_correlation value: correlation_coefficient;
 				}
 				
@@ -80,8 +71,7 @@ entities {
 				set potential_inverse_distance value: distance/DISK_RADIUS;
 				set potential_correlation value: deviation_correlation;
 				
-				if ((deviation_correlation >= CORRELATION_THRESHOLD) and (((potential_inverse_distance + potential_correlation) / 2) > potential_condition))
-				{
+				if ((deviation_correlation >= CORRELATION_THRESHOLD) and (((potential_inverse_distance + potential_correlation) / 2) > potential_condition)) {
 					set potential_condition value: (potential_inverse_distance +  potential_correlation) / 2;	
 					set the_potential_cell value: the_cell; // SAI
 					set location_found value: true;
@@ -90,8 +80,7 @@ entities {
 				set testcor value: potential_condition;
 			}
 			
-			if(location_found)
-			{
+			if(location_found) {
 				create species: node number: 1
 				{
 					set existing_status value: false;
@@ -101,10 +90,9 @@ entities {
 				
 				// CREATE NEW EDGE:
 						
-				create species: edge number: 1;
-				set current_edge value: edge at (length(edge) - 1);
-				set current_edge.source value: center_node;
-				
+				create species: _edge number: 1;
+				set current_edge value: _edge at (length(_edge) - 1);
+				set current_edge.source value: center_node;	
 				let the_destination type: node value: node at (length(node) - 1); 
 				set current_edge.destination value: the_destination;
 				set current_edge.shape value: polygon([{((center_node) . location) . x, ((center_node) . location) . y }, { ((the_destination) . location) . x, ((the_destination) . location) . y}]);
@@ -112,8 +100,7 @@ entities {
 			
 		}
 		
-		action allocateNewNodeByStdDeviation
-		{
+		action allocateNewNodeByStdDeviation {
 			arg center_node type: node;
 			
 			let location_found type: bool value: false;
@@ -128,7 +115,7 @@ entities {
 			let selected_correlation type: float value: 0.0;
 			let current_correlation type: float value: 0.0;
 			let center_correlation type: float value: 0.0;
-			let the_potential_cell type: cellula_automata value: nil;
+			let the_potential_cell type: cellula_automata <- nil;
 			
 			ask target: center_node
 			{
@@ -257,8 +244,8 @@ entities {
 					
 					if(selected_correlation >= CORRELATION_THRESHOLD)
 					{
-						create species: edge number: 1;
-						set current_edge value: edge at (length(edge) - 1);
+						create species: _edge number: 1;
+						set current_edge value: _edge at (length(_edge) - 1);
 						set current_edge.source value: center_node;
 						ask center_node{
 							set degree value: degree + 1;
@@ -318,10 +305,10 @@ entities {
 			
 			loop i from: 0 to: NUMBER_OF_ADDED_NODES - 1
 			{
-				int _location value: int (rnd(cell_count - 1));
-				bool allocated value: false;
-				loop while: !allocated
-				{
+				int _location <- int (rnd(cell_count - 1));
+				bool allocated <- false;
+				
+				loop while: !allocated {
 					if(((cellula_automata at _location).hinder_index <= 0.6) and !(cellula_automata at _location).is_monitored)
 					{
 						set allocated value: true;
@@ -334,8 +321,7 @@ entities {
 							set (cellula_automata at _location).is_monitored value: true;
 						}
 					}
-					else
-					{
+					else {
 						set _location value: int (rnd(cell_count - 1));
 					}
 				}
@@ -396,19 +382,17 @@ entities {
 		}
 		
 		
-		action resetEdgesList{
+		action resetEdgesList {
 			set setup value: 1;
 			
 			let count type: int value: length (node) - 1;
 			let i type: int value: 0;
-			loop i from: 0 to: length (node) - 2
-			{
+			loop i from: 0 to: length (node) - 2 {
 				
 				let the_outside_node value: node at i;  
 				
 				let j type: int value: 0;
-				loop j from: i + 1 to: length (node) - 1 
-				{
+				loop j from: i + 1 to: length (node) - 1 {
 					
 					node the_inside_node value: node at j;
 					
@@ -417,8 +401,8 @@ entities {
 					{
 						set x1  value: (float(((the_outside_node) . location) . x));  
 						set y1  value: (float(((the_outside_node) . location) . y));						
-						set x2  value: (float(((the_inside_node) . location) . x));  
-						set y2  value: (float(((the_inside_node) . location) . y));
+						set x2  value: (float(((the_inside_node)  . location) . x));  
+						set y2  value: (float(((the_inside_node)  . location) . y));
 						
 						// Calculating the maximum location:
 						set x1_to  value: (float (x1 + float(DISK_RADIUS * float(float (cos(alpha))))));
@@ -466,8 +450,8 @@ entities {
 							if correlationW >= CORRELATION_THRESHOLD
 							{
 								
-								create species: edge number: 1;
-								set current_edge value: edge at lasted_edge_id;
+								create species: _edge number: 1;
+								set current_edge value: _edge at lasted_edge_id;
 								set current_edge.source value: the_outside_node;
 								
 								ask the_outside_node{
@@ -489,20 +473,16 @@ entities {
 						else
 						{
 							// Correlation weight:
-							set vectorXX value: nil;
-							set vectorYY value: nil;
-							ask target: the_inside_node
-							{
-								loop i from: 0 to: (HISTORICAL_DURATION - 1)
-								{
+							set vectorXX <- nil;
+							set vectorYY <- nil;
+							ask target: the_inside_node {
+								loop i from: 0 to: (HISTORICAL_DURATION - 1) {
 									set vectorXX value: vectorXX + [float(density_matrix at {0, i})];
 									//put item: float(density_matrix at {0, i}) at: i in: vectorXX;
 								}
 							}
 							
-							
-							ask target: the_outside_node
-							{
+							ask target: the_outside_node {
 								loop i from: 0 to: (HISTORICAL_DURATION - 1)
 								{
 									set vectorYY value: vectorYY + [float(density_matrix at {0, i})];
@@ -517,8 +497,8 @@ entities {
 							set correlationAVG value: correlationW + correlationAVG;
 							if correlationW >= CORRELATION_THRESHOLD
 							{
-								create species: edge number: 1;
-								set current_edge value: edge at lasted_edge_id;
+								create species: _edge number: 1;
+								set current_edge update: _edge at lasted_edge_id;
 								set current_edge.source value: the_inside_node;
 								set current_edge.destination value: the_outside_node;
 								set current_edge.shape value: polygon([{((the_inside_node) . location) . x, ((the_inside_node) . location) . y }, { ((the_outside_node) . location) . x, ((the_outside_node) . location) . y}]);
@@ -526,21 +506,11 @@ entities {
 							
 								
 								set correlationCount value: correlationCount + 1;
-							}
-							
-						}
-						
-					}
-					
-					
+							}	
+						}	
+					}	
 				}
-			
-			}
-			
-			
+			}			
 		}
 	} 
-}
-output{
-}
 

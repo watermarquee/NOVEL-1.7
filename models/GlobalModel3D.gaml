@@ -4,18 +4,14 @@
  *  Last Modified Date: 17-02-2017
  */
  
-
 model InsectSNM
 
 import "../includes/GlobalParam.gaml"
 import "../includes/administratives/administrative_region.gaml"
 import "../includes/ecologies/rice_region.gaml"
-
 import "../includes/surveillances/node_network.gaml"
 import "../includes/surveillances/edge_network.gaml"
 import "../includes/surveillances/graph_network.gaml"
-
-
 import "../includes/naturals/natural_environment.gaml"
 import "../includes/naturals/weather_region.gaml"
 
@@ -33,21 +29,21 @@ global {
 	edge current_edge <- nil;
 	NaturalEnvironment current_natural_environment <- nil; 
 	
-//	// Light-trap data:
+//	 Light-trap data:
 //	var lighttrap_data type: matrix value: matrix (file ('../includes/datasources/lighttrap_data_2010_Correlation_Var.csv'));
 //	
-//	// Map of standard deviation: 
+//	 Map of standard deviation: 
 //	var standard_deviation_data type: matrix value: matrix (file ('../includes/datasources/stdDeviation.csv'));
 //	
 //	
-//	// Weather data:
+//	Weather data:
 //	var genaral_weather_data type: matrix value: matrix (file ('../includes/datasources/general_weather_data.csv'));
 //	
-//	// Wind data:
+//	Wind data:
 //	var station_weather_data type: matrix value: matrix (file ('../includes/datasources/station_weather_data03.csv'));
 
-    //FOR SQL. Maping 1:1
-	// Light-trap data:
+//	FOR SQL. Maping 1:1
+//	Light-trap data:
 	matrix lighttrap_data;
 	// Map of standard deviation: 
 	matrix standard_deviation_data;
@@ -64,7 +60,7 @@ global {
 	int orthogonal_vector_index <- 0 ;
 	float sum_distance <- 0.0 ;
 	float sum_beta <- 0.0 ;
-	flaot estimated_value <- 0.0 ;
+	float estimated_value <- 0.0 ;
 	int growthToken <- 0;
 	
 	// Simulation step:
@@ -114,7 +110,7 @@ global {
 	list MSE_VARIOGRAM_ADDED_NETWORK <- nil;
 	 
 	float MSE_VARIOGRAM_CURRENT_MODEL <- 0.0;
-	flaot MSE_VARIOGRAM_OPTIMAL_MODEL <- 0.0;
+	float MSE_VARIOGRAM_OPTIMAL_MODEL <- 0.0;
 
 	// Coordinate vector of lighttrap:
 	list CURRENT_LIGHTTRAP_COORDINATES_X <- nil;
@@ -126,14 +122,12 @@ global {
 	list CURRENT_CELLS_COORDINATES_X <- nil;
 	list CURRENT_CELLS_COORDINATES_Y <- nil;
 	
-	
-	
 	// Temp variables:
-	list temp <- nil;
-	int _month <- 0;
-	string _id_Data <- 0;
-	string _id <- 0;
-	int _count <- 0;
+	list temp       <- nil;
+	int _month      <- 0;
+	string _id_Data <- string(0);
+	string _id      <- string(0);
+	int _count      <- 0;
 	
 	
 	init{
@@ -154,17 +148,16 @@ global {
 //		create species: node from: SHAPE_NODE with: [id :: read('ID'), name :: read('LightTrap'), district_name :: read('District'), province_name :: read('Province'), id_0 :: read('ID_0'), id_1 :: read('ID_1'), id_2 :: read('ID_2')];
 //		create species: weather_region from: SHAPE_WEATHER with: [id :: read('ID'), name :: read('NAME')];
 //---------------------------------------------------------------------------
-	    create species: db number: 1  
-		{ 
-			create species:district_region from: list(self select [params:: PARAMS, select:: ADMINISTRATIVE_DISTRICT]) with:[ id_1:: "id_1",region_name :: 'NAME_1', id_2 :: 'ID_2', province_name :: 'NAME_2', district_name :: 'NAME_3', shape::'geo'];
-			create species:province_region from: list(self select [params:: PARAMS, select:: ADMINISTRATIVE_PROVINCE]) with:[ id_1:: "id_1",region_name :: 'NAME_1', id_2 :: 'ID_2', province_name :: 'NAME_2', shape::'geo'];
-			create species:sea_region from: list(self select [params:: PARAMS, select:: SEA_REGION]) with:[description :: 'Description', shape::'geo'];
-			create species:WS_rice_region from: list(self select [params:: PARAMS, select:: WS_LAND_USE]) with:[id :: 'ID', description ::'SDD', shape::'geo'];
-			create species:SA_rice_region from: list(self select [params:: PARAMS, select:: SA_LAND_USE]) with:[id :: 'ID', description ::'SDD', shape::'geo'];
-			create species:node from: list(self select [params:: PARAMS, select:: NODE]) with:[id :: 'ID', name :: 'LightTrap', district_name :: 'District', province_name :: 'Province', id_0 :: 'ID_0', id_1 :: 'ID_1', id_2 :: 'ID_2',shape::'geo'];
+	    create species: db number: 1 { 
+			create species:district_region from: list(self select [params:: PARAMS, select:: ADMINISTRATIVE_DISTRICT]) with:[ id_1:: "id_1",region_name :: 'NAME_1', id_2 :: 'ID_2', province_name :: 'NAME_2', district_name :: 'NAME_3'];
+			create species:province_region from: list(self select [params:: PARAMS, select:: ADMINISTRATIVE_PROVINCE]) with:[ id_1:: "id_1",region_name :: 'NAME_1', id_2 :: 'ID_2', province_name :: 'NAME_2'];
+			create species:sea_region from: list(self select [params:: PARAMS, select:: SEA_REGION]) with:[description :: 'Description'];
+			create species:WS_rice_region from: list(self select [params:: PARAMS, select:: WS_LAND_USE]) with:[id :: 'ID', description ::'SDD'];
+			create species:SA_rice_region from: list(self select [params:: PARAMS, select:: SA_LAND_USE]) with:[id :: 'ID', description ::'SDD'];
+			create species:node from: list(self select [params:: PARAMS, select:: NODE]) with:[id :: 'ID', name :: 'LightTrap', district_name :: 'District', province_name :: 'Province', id_0 :: 'ID_0', id_1 :: 'ID_1', id_2 :: 'ID_2'];
 			
 			
-			create species: weather_region from: list(self select [params:: PARAMS, select:: WEATHER]) with: [id :: 'ID', name :: 'NAME',shape::'geo'];
+			create species: weather_region from: list(self select [params:: PARAMS, select:: WEATHER]) with: [id :: 'ID', name :: 'NAME'];
 			set lighttrap_data <- matrix(self list2Matrix[param::list(self select [params:: PARAMS, select::LIGHTTRAP_DATA])]);
 			set standard_deviation_data <- matrix(self list2Matrix[param::list(self select [params:: PARAMS, select::STANDARD_DEVIATION_DATA])]);
 			set genaral_weather_data <- matrix(self list2Matrix[param::list(self select [params:: PARAMS, select::GENERAL_WEATHER_DATA])]);
@@ -184,8 +177,7 @@ global {
 	
 		
 		// UDG Species
-		create species: UnitDiskGraph number: 1
-		{
+		create species: UnitDiskGraph number: 1 {
 			no_of_nodes update: length(node);
 		}
 		
@@ -204,13 +196,12 @@ global {
 		write updateMonthDayYear2010;
 		//do optimizeByCDGAlgorithm;
 		//do optimizeByPSOAlgorithm;
-		write optimizeByMicroAlgorithm;
-		
+		write optimizeByMicroAlgorithm;		
 		write dumpLighttrap;
 	}
 
-	action getCoordinates
-	{
+	action getCoordinates {
+		
 		BOUNDARY_MAX_X update: cellula_automata max_of (cellula_automata(each).location.x);
 		BOUNDARY_MIN_X update: cellula_automata min_of (cellula_automata(each).location.x);
 		BOUNDARY_MAX_Y update: cellula_automata max_of (cellula_automata(each).location.y);
@@ -223,50 +214,39 @@ global {
 		
 	}
 	
-	action dumpLighttrap
-	{
-		if(SIMULATION_STEP = 65)
-		{
-			loop i from: 0 to: length(node) - 1
-			{
+	action dumpLighttrap {
+		if(SIMULATION_STEP = 65) {
+			loop i from: 0 to: length(node) - 1 {
 				write "ID:  " + string ((node at i).id) + ", name: " + string ((node at i).name);
 				write (node at i).density_matrix;
-				
 				write (node at i).simulation_density_matrix;
 			}
 		}
-		
 	}
 	
-	action optimizeByMicroAlgorithm
-	{
+	action optimizeByMicroAlgorithm {
 		write "OptimizePSO algorithm - GLOBAL STEP: " + SIMULATION_STEP;
 		do action: getCoordinates;
 		
-		if (SIMULATION_STEP = 0)
-		{
+		if (SIMULATION_STEP = 0) {
 			do action: loadCellsCoordinates;
 			do action: loadLighttrapData;
 			do action: loadStandardDeviation;
 			//do action: loadStandardDeviationR;
 			do action: loadGeneralWeatherData;
 			do action: loadStationWeatherData;
-			
 			do action: loadCurrentTrapCoordinates;
 			do action: loadOptimalTrapCoordinates;
-			
 			do action: estimate_IDW_Correlation;
 			
 			// Surface of standard deviation 
-			ask cellula_std_deviation as list
-			{		
+			ask cellula_std_deviation as list {		
 				list cells_possibles of: cellula_std_deviation <- (self neighbours_at 2) + self;
 			
-				loop i from: 0 to: length(shape.points) - 1
-				{ 
-					let geom type: geometry <- square(1.0);
-					set geom <- geom translated_to (shape.points at i);
-					let myCells type: list of: cellula_std_deviation <- cells_possibles where (each.shape intersects geom);
+				loop i from: 0 to: length(shape.points) - 1 { 
+					geometry geom <- square(1.0);
+					geom <- geom translated_to (shape.points at i);
+					list myCells of: cellula_std_deviation <- cells_possibles where (each.shape intersects geom);
 					//write "z value: " + z;
 					let z1 type: float <- mean (myCells collect (each.z));
 					set shape <- shape add_z_pt {i, (z1^2)};
@@ -781,7 +761,7 @@ global {
 		 
 		density_list <- density_list + LIGHTTRAP_COORDINATES_X + LIGHTTRAP_COORDINATES_Y;
 		
-		result <- R_compute_param("../includes/RCode/MSE_Variogram_Exponential.R", density_list);
+		result <- R_file("../includes/RCode/MSE_Variogram_Exponential.R", density_list);
 		rs <- result['result'];
 		//int _index <- set_at;
 		MSE_VARIOGRAM_LIST[set_at] <- float(rs[0]);
@@ -1808,9 +1788,9 @@ global {
 		let vectorY type: list value: nil;
 		
 		
-		loop i from: 0 to: length (edge) - 1
+		loop i from: 0 to: length (_edge) - 1
 		{ 
-			ask edge at i
+			ask _edge at i
 			{
 				let source_node type: node value: source;
 				let destination_node type: node value: destination;
@@ -1923,7 +1903,7 @@ environment bounds: SHAPE_ADMINISTRATIVE_THREE_PROVINCES //SHAPE_ADMINISTRATIVE_
 		const id type: string ;
 		const name type: string ;
 							
-		var correlation_coefficient type: float init: 0.001;
+		float correlation_coefficient <- 0.001;
 		var sample_variance type: float init: 0.001;
 		// FOR TRAP (Temp)
 		var trap_correlation_coefficient type: float init: 0.001;
@@ -2379,15 +2359,13 @@ environment bounds: SHAPE_ADMINISTRATIVE_THREE_PROVINCES //SHAPE_ADMINISTRATIVE_
 		// Growth model: Applied for one cell
 		// Built date: December 04, 2012
 		//
- 		action growthCycle
-		{
+ 		action growthCycle {
 			let _mortality_rate  type: float value: NATURAL_MORTALITY_RATE + MORTALITY_RATE_BY_PREDACTORS;
 			let _density_sum type: float value: 0.0;
 			let _density_born type: float value: 0.0;
 			let _density_born_sum type: float value: 0.0;
 			
-			loop i from: 0 to: BPH_LIFE_DURATION - 2
-			{
+			loop i from: 0 to: BPH_LIFE_DURATION - 2 {
 				//let _density type: float value: float(grid_density_matrix at {0, i});
 				let _density_previous type: float value: float(grid_density_matrix at {0, (i + 1)});
 				let _density type: float value: _density_previous - (_density_previous * _mortality_rate);
@@ -2395,13 +2373,11 @@ environment bounds: SHAPE_ADMINISTRATIVE_THREE_PROVINCES //SHAPE_ADMINISTRATIVE_
 				
 				// Sum all densities of adult satges (11 days):
 				
-				if((i >= 0) and (i <= (ADULT_DURATION - 1)))
-				{
+				if((i >= 0) and (i <= (ADULT_DURATION - 1))) {
 					set _density_sum value: _density_sum + _density;
 					
 					// EGGS BORN
-					if((i >= (ADULT_DURATION - ADULT_DURATION_GIVING_BIRTH_DURATION - 1)))
-					{
+					if((i >= (ADULT_DURATION - ADULT_DURATION_GIVING_BIRTH_DURATION - 1))) {
 						set _density_born_sum value: _density_born_sum + _density * ADULT_EGG_RATE;
 					} 
 				}
@@ -2413,8 +2389,7 @@ environment bounds: SHAPE_ADMINISTRATIVE_THREE_PROVINCES //SHAPE_ADMINISTRATIVE_
 			set number_of_BPHs value: _density_sum;
 		}
 		
-		action setcolor 
-		{
+		action setcolor {
 			set color value: (number_of_BPHs > 10000)?rgb([255,0,0]):        
 					((number_of_BPHs > 7500)?rgb([255,30,17]):        
 					((number_of_BPHs > 5000)?rgb([255,55,29]):        
@@ -2454,7 +2429,7 @@ output {
 		//species UnitDiskGraph transparency: 0.5 ;
 		species sea_region transparency: 0 ;
 		species node  aspect: default transparency: 0;
-		species edge aspect: default  transparency: 0 ;
+		species _edge aspect: default  transparency: 0 ;
 		
 		//species weather_region aspect: default  transparency: 0.5 ;
 		
@@ -2463,20 +2438,20 @@ output {
 	display GlobalView3D type:opengl{
 		species cellula_automata aspect: ThreeDirections;
 		species node  aspect: ThreeDirections transparency: 0;
-		species edge aspect: default  transparency: 0 ;
+		species _edge aspect: default  transparency: 0 ;
 	}
 	
 	display GlobalCorrelation {
 		grid cellula_correlation transparency: 0;
 		species node  aspect: default transparency: 0;
-		species edge aspect: default  transparency: 0 ;
+		species _edge aspect: default  transparency: 0 ;
 		species sea_region transparency: 0.7;
 	}
 	
 	display StandardErrors type:opengl {
 		species cellula_std_deviation aspect: elevation;
 		species node  aspect: ThreeDirections transparency: 0;
-		species edge aspect: default  transparency: 0 ;
+		species _edge aspect: default  transparency: 0 ;
 	}
 	
 	display Weather{
@@ -2485,21 +2460,17 @@ output {
 	
 	
 	
-	display MovingCorrelationChart_Graph
-	{
-		chart name: "BPHs density via days (from dd/mm/yyyy)" type: "series"
-		{
-			data name: "Correlation between all two consecutive days" value: twoDaysCorrelation color: rgb('blue');
-			data name: "Accumulative average of correlation" value: twoDaysCorrelationAVG color: rgb('red');
+	display MovingCorrelationChart_Graph {
+		chart name: "BPHs density via days (from dd/mm/yyyy)" type: "series" {
+			data "Correlation between all two consecutive days" value: twoDaysCorrelation color:#blue;
+			data "Accumulative average of correlation" value: twoDaysCorrelationAVG color:#red;
 		}
 	}
 	
-	display EdgesCorrelationChart_Graph
-	{
-		chart name: "BPHs density via days (from dd/mm/yyyy)" type: series
-		{
-			data name: "Correlation between all edges" value: edgesCorrelation color: rgb('blue');
-			data name: "Accumulative average of correlation" value: edgesCorrelationAVG color: rgb('red');
+	display EdgesCorrelationChart_Graph {
+		chart name: "BPHs density via days (from dd/mm/yyyy)" type: series {
+			data "Correlation between all edges" value: edgesCorrelation color:#blue;
+			data "Accumulative average of correlation" value: edgesCorrelationAVG color:#red;
 		}
 	}
 //	
@@ -2619,15 +2590,15 @@ output {
 	display MSE_Variogram {
   		chart  "MSE of variogram model" type: series {
 	  		//data MSE_REAL value: MSE_VARIOGRAM color: rgb('blue') ;
-	  		data "MSE_CURRENT_NETWORK" value: MSE_VARIOGRAM_LIST at 0 color: rgb('red') ;
-	  		data "MSE_OPTIMAL_NETWORK" value: MSE_VARIOGRAM_LIST at 1 color: rgb('green') ;
-	  		data "MSE_ADDED_NETWORK" value: MSE_VARIOGRAM_LIST at 2 color: rgb('black') ;
+	  		data "MSE_CURRENT_NETWORK" value: MSE_VARIOGRAM_LIST at 0 color:#red;
+	  		data "MSE_OPTIMAL_NETWORK" value: MSE_VARIOGRAM_LIST at 1 color:#green;
+	  		data "MSE_ADDED_NETWORK" value: MSE_VARIOGRAM_LIST at 2 color:#black;
 	  	}
   	}
  	
-	monitor NUMBER_OF_EDGES value: length(edge as list) refresh_every: 1 ;
-	monitor NUMBER_OF_NODES value: length(node as list) refresh_every: 1 ;
-	monitor Simulation_Step value: SIMULATION_STEP refresh_every: 1;
+	monitor NUMBER_OF_EDGES value: length(_edge as list) refresh: every(1);
+	monitor NUMBER_OF_NODES value: length(node as list) refresh: every(1);
+	monitor Simulation_Step value: SIMULATION_STEP refresh: every(1);
 
 
 }

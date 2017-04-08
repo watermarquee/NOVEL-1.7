@@ -15,60 +15,52 @@ import "../../models/GlobalModel3D.gaml"
 global {
 	//var SHAPE_NODE type: string init: '../includes/gis/surveillances/provinces/DongThap_Lighttraps.shp' parameter: 'Sensors Network - DONG THAP:' category: 'SURVEILLANCE' ;
 }
-
-entities {
 	
 		species node {
-		var id type: string ;
-		var name type: string ;
-		var id_0 type: string ;
-		var id_1 type: string ;
-		var id_2 type: string ;
-		var province_name type: string ;
-		var id_3 type: string ;
-		var district_name type: string ;
+		string id;
+		string name;
+		string id_0;
+		string id_1;
+		string id_2;
+		string province_name;
+		string id_3;
+		string district_name;
 		matrix density_matrix size: {1, 365};
 		matrix simulation_density_matrix size: {1, 365};
 		
-		var number_of_BPHs type: float init: 0.0;
+		float number_of_BPHs <- 0.0;
 		//var number_of_BPHs_by_day_model type: float init: 0.0;
-		var number_of_BPHs_by_day type: float init: 0.0;
+		float number_of_BPHs_by_day <- 0.0;
 		
-		var number_of_BPHs_total type: float init: 0.0 ;
+		float number_of_BPHs_total <- 0.0 ;
 		
 		// WORKING STATUS: TRUE/FALSE
-		var working_status type: bool init: true;
-		var existing_status type: bool init: true;
-		var model_status type: string init: "ESTABLISHED";
+		bool working_status  <- true;
+		bool existing_status <- true;
+		string model_status <- "ESTABLISHED";
 				
 		// Dominated cell:
-		var dominated_cell type: cellula_automata;
-		var dominated_cell_correlation type: cellula_correlation;
-		var dominated_std_deviation type: cellula_std_deviation;
-		
+		cellula_automata dominated_cell;
+		cellula_correlation dominated_cell_correlation;
+		cellula_std_deviation dominated_std_deviation;
 		
 		// OPTIMIZATION SUPPORTS
-		var correlation_coefficient type: float init: 0.0;
-		var sample_variance type: float init: 0.0;
-		
-		
-		var degree type: int init: 0;
-		
+		float correlation_coefficient <- 0.0;
+		float sample_variance <- 0.0;
+		int degree <- 0;
 		
 		// For PSO:
-		var velocity_x type: float value: 0.0;
-		var velocity_y type: float value: 0.0;
-		
-		
+		float velocity_x <- 0.0;
+		float velocity_y <- 0.0;
+			
 		// For Tabu search:
-		var Tabu_List type: list init: nil;
-		var TABU_LIST_MAXLENGHT type: int init: 24;
-		var Tabu_List_lenght type: int init: 0;
+		list Tabu_List <- nil;
+		int TABU_LIST_MAXLENGHT <- 24;
+		int Tabu_List_lenght <- 0;
+	
+		rgb nodecolor <- rgb([0, 0, 255]); //(existing_status)?rgb([0,255,0]):rgb([255, 255,0]);
 		
-		
-		var nodecolor type: rgb value: rgb([0, 0, 255]); //(existing_status)?rgb([0,255,0]):rgb([255, 255,0]);
-		
-		var z type: float init: 0.0;
+		float z <- 0.0;
 				
 		init{
 			set location value: self.location;
@@ -122,7 +114,7 @@ entities {
 		aspect ThreeDirections {
 			//draw shape: circle color: rgb([255, 0, 255]) size: 1500 ;
 			draw circle(500) color: nodecolor;
-			set z value: 50;
+			set z value: float(50);
 		}
 		
 		action setnewcolor {
@@ -158,7 +150,7 @@ entities {
 		{
 			let _the_std_deviation type: cellula_std_deviation value: dominated_std_deviation;
 			let _current_std_deviation type: float value: _the_std_deviation.estimation_std_deviation;
-			let std_deviation_list type: list value:  (dominated_std_deviation neighbours_at 1) of_species cellula_std_deviation;
+			let std_deviation_list type: list value: (dominated_std_deviation neighbours_at 1) of_species cellula_std_deviation;
 			let node_list type: list value:  (list (node))  where ((node (each) distance_to self) <= DISK_RADIUS);
 			
 			
@@ -174,15 +166,17 @@ entities {
 						set _current_min_distance <- _distance;
 					}
 				}
-			}
+			}			
 			
+//			let _maximum_std_deviationL type: float value: 0.0;
+//			let _maximum_cell_std_deviationL type: cellula_std_deviation value: nil;
+			float _maximum_std_deviationL <- 0.0;
+			cellula_std_deviation _maximum_cell_std_deviationL <- nil;
 			
-			
-			let _maximum_std_deviationL type: float value: 0.0;
-			let _maximum_cell_std_deviationL type: cellula_std_deviation value: nil;
-			
-			let _maximum_std_deviationG type: float value: 0.0;
-			let _maximum_cell_std_deviationG type: cellula_std_deviation value: nil;
+//			let _maximum_std_deviationG type: float value: 0.0;
+//			let _maximum_cell_std_deviationG type: cellula_std_deviation value: nil;
+			float _maximum_std_deviationG <- 0.0;
+			cellula_std_deviation _maximum_cell_std_deviationG <- nil;
 			
 			// Local best
 			loop i from: 0 to: length(std_deviation_list) - 1
@@ -216,7 +210,7 @@ entities {
 				if(_neighbour_std_deviation > _maximum_std_deviationG)
 				{
 					set _maximum_std_deviationG value: _neighbour_std_deviation;
-					set _maximum_cell_std_deviationG value:  (node_list at i).dominated_std_deviation;
+					set _maximum_cell_std_deviationG value: (node_list at i).dominated_std_deviation;
 				}
 			}
 			// Next location:
@@ -736,7 +730,5 @@ entities {
 			put item: number_of_BPHs at: {0, SIMULATION_STEP} in: simulation_density_matrix;
 		}
 	}
-}
-output;
 
 

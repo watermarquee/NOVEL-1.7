@@ -8,19 +8,17 @@ global {
 }
 
 
-
-entities {
-	species edge {
-		var id type: string ;
-		var name type: string ;
-		var source type: node init: nil;
-		var destination type: node init: nil;
+	species _edge {
+	    string id;
+		string name;
+		node source <- nil;
+		node destination <- nil;
 			
 		
-		var shape type: geometry init: polygon([{0,0}, {1,1}, {0,0}]);		
-		var coefficience type: int init: 0 ;
-		var correlationWeight type: int init: 0 ;
-		var color type: rgb init: rgb([0, 0, 0]);
+		geometry shape <- polygon([{0,0}, {1,1}, {0,0}]);		
+		int coefficience <- 0;
+		int correlationWeight <- 0;
+		rgb color <- rgb([0, 0, 0]);
 		
 		/*
 		var color type: rgb value: (coefficience > 1000000)?rgb [0,0,0]:        
@@ -47,16 +45,19 @@ entities {
 						
 						*/
 		
+//		aspect default {
+//			draw shape: geometry color: rgb ([128, 128, 0]) size:  2;
+//			
+//			
+//			draw text: "ABCABCABCABCABCABCABCABCABCABCABCABC" color: rgb('black') size: 10 at: {10000, 100000};
+//			draw shape: line at: source.location to: destination.location color: rgb ("blue") size: 1 ;
+//			
+//		}
+		
 		aspect default {
-			draw shape: geometry color: rgb ([128, 128, 0]) size:  2;
+			draw geometry:circle(2) color: rgb(["r"::128, "g"::128, "b"::0]);
+    }
 			
-			
-			//draw text: "ABCABCABCABCABCABCABCABCABCABCABCABC" color: rgb('black') size: 10 at: {10000, 100000};
-			//draw shape: line at: source.location to: destination.location color: rgb ("blue") size: 1 ;
-			
-		}
-		
-		
 		action setcolor {
 			set color value: (correlationWeight >= 0.1)?rgb ([255, 0, 0]):rgb ([0, 0, 255]);
 			// TO DO	
@@ -83,10 +84,6 @@ entities {
 					((coefficience > 25)?rgb [255,237,237]:
 					rgb [255,255,255]))))))))))))))))))) ;
 			*/
-		}
-		
-		
-
+		}	
 	}
-}
-output ;
+
